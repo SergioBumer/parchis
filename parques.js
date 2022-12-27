@@ -32,7 +32,7 @@ function createTokens(playerIndex) {
 }
 
 function calculatePitches(player) {
-  if (player?.tokensInBoard === 0) {
+  if (player?.tokensInBoard.length === 0) {
     return 3;
   }
   return 1;
@@ -45,12 +45,18 @@ function changePlayer(playerIndex, jugadores) {
   return playerIndex + 1;
 }
 
-function pairHandler(players, playerIndex, result) {
+function pairHandler(resultado) {
   var normalPair = [2, 3, 4, 5];
+  console.log(resultado);
   if (
-    !normalPair.includes(result[0]) ||
+    !normalPair.includes(resultado[0]) ||
     players[playerIndex].tokensInJail.length <= 2
   ) {
+    console.log(
+      `Opcion 1: ${!normalPair.includes(resultado[0])} Opcion 2: ${
+        players[playerIndex].tokensInJail.length
+      }`
+    );
     players[playerIndex].tokensInJail.forEach((element) => {
       players[playerIndex].tokensInBoard.push(element);
     });
@@ -71,6 +77,7 @@ var gameOver = true;
 var playerIndex = 0;
 var totalLanzamientos = 0;
 var players = createPlayers();
+var auditoriaTurnos = [];
 // Prueba de juegos hasta consegui
 /* var testGamesInMaxThrows = true;
 var expectedThrows = 4;
@@ -82,9 +89,13 @@ while (gameOver) {
       `El jugador ${players[playerIndex].id} tiene ${turnos} turnos.`
     ); */
   while (turnos > 0) {
+    turnos--;
     var resultado = throwDices();
-    console.log(resultado);
+    // console.log(resultado);
     totalLanzamientos++;
+    auditoriaTurnos.push(
+      `El jugador ${players[playerIndex].id} ha sacado ${resultado}`
+    );
     if (resultado[2]) {
       /* console.log(
         `El jugador ${players[playerIndex].id} saca la ficha ${
@@ -93,9 +104,7 @@ while (gameOver) {
           ].id
         }`
       ); */
-      players[playerIndex].tokensInBoard.push(
-        players[playerIndex].tokensInJail.pop()
-      );
+      pairHandler(resultado);
       /* console.log(
           `El jugador ${players[playerIndex].id} tiene ${
             players[playerIndex].tokensInJail.length
@@ -103,6 +112,7 @@ while (gameOver) {
             players[playerIndex].tokensInJail.length === 1 ? "ficha" : "fichas"
           } en la carcel`
         ); */
+        turnos = 1;
       if (players[playerIndex].tokensInJail.length === 0) {
         console.log(`El jugador ${players[playerIndex].id} gana la partida!!!`);
         console.log(
@@ -110,15 +120,17 @@ while (gameOver) {
         );
         console.log(totalLanzamientos);
         gameOver = false;
+        turnos = 0;
+        auditoriaTurnos.forEach((registro) => {
+          console.log(registro);
+        });
         /* if (totalLanzamientos === expectedThrows) {
             testGamesInMaxThrows = false;
           }
           testExpectedGames++;
           gameOver = false;
-          turnos = 0; */
+           */
       }
-    } else {
-      turnos--;
     }
   }
 
